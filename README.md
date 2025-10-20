@@ -32,38 +32,4 @@
 
 ---
 
-### Guía para Subir el Proyecto a GitHub
-
-Sigue estos pasos para guardar tu código en un repositorio de GitHub.
-
-1.  **Crear un Nuevo Repositorio en GitHub:**
-    *   Ve a [github.com](https://github.com) y accede a tu cuenta.
-    *   Haz clic en el botón `+` en la esquina superior derecha y selecciona `New repository`.
-    *   Dale un nombre a tu repositorio (ej. `cotizador-alturas`), elige si será público o privado y haz clic en `Create repository`. **Importante:** No inicialices el repositorio con un `README` o `.gitignore` desde GitHub, ya que tú subirás los archivos existentes.
-
-2.  **Conectar tu Proyecto Local con GitHub:**
-    *   En la terminal de VS Code, ejecuta los siguientes comandos uno por uno. Reemplaza `<tu-usuario>` y `<nombre-del-repositorio>` con tu nombre de usuario y el nombre que le diste al repositorio en GitHub.
-
-    *   **Inicializa Git en tu proyecto (si no lo has hecho):**
-        ```bash
-        git init
-        git add .
-        git commit -m "Commit inicial: Configuración del proyecto"
-        ```
-
-    *   **Conecta tu repositorio local al remoto:**
-        ```bash
-        git branch -M main
-        git remote add origin https://github.com/<tu-usuario>/<nombre-del-repositorio>.git
-        ```
-
-    *   **Sube tu código a GitHub:**
-        ```bash
-        git push -u origin main
-        ```
-
-¡Listo! Ahora tu código está guardado en GitHub y puedes seguir haciendo `commits` y `push` a medida que avanzas en el desarrollo.
-
----
-
 Desarrollado por Jean Pérez - SMARTSYS
