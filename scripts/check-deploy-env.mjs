@@ -2,13 +2,13 @@ import "dotenv/config";
 
 const isVercel = process.env.VERCEL === "1";
 const isProduction = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
-const databaseUrl = process.env.DATABASE_URL;
+const databaseUrl = process.env.DATABASE_URL_APP ?? process.env.DATABASE_URL;
 const authSecret = process.env.AUTH_SECRET;
 const adminUsername = process.env.ADMIN_USERNAME;
 const adminPassword = process.env.ADMIN_PASSWORD;
 
 const missing = [];
-if (!databaseUrl) missing.push("DATABASE_URL");
+if (!databaseUrl) missing.push("DATABASE_URL_APP o DATABASE_URL");
 if (!authSecret) missing.push("AUTH_SECRET");
 if (!adminUsername) missing.push("ADMIN_USERNAME");
 if (!adminPassword) missing.push("ADMIN_PASSWORD");
@@ -19,7 +19,7 @@ if (missing.length > 0) {
 }
 
 if (isVercel && isProduction && databaseUrl.startsWith("file:")) {
-  console.error("DATABASE_URL no puede ser SQLite local (file:) en Vercel Production. Usa Postgres gestionado.");
+  console.error("DATABASE_URL_APP/DATABASE_URL no puede ser SQLite local (file:) en Vercel Production. Usa Postgres gestionado.");
   process.exit(1);
 }
 

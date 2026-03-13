@@ -1,13 +1,15 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
 
-if (!process.env.DATABASE_URL) {
-  console.error("DATABASE_URL no esta definida.");
+const connectionString = process.env.DATABASE_URL_APP ?? process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error("DATABASE_URL_APP o DATABASE_URL no esta definida.");
   process.exit(1);
 }
 
 const prisma = new PrismaClient({
-  adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL }),
+  adapter: new PrismaPg({ connectionString }),
 });
 
 const email = process.argv[2]?.toLowerCase();
