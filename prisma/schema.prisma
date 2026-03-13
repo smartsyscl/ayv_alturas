@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum QuoteStatus {
+  PENDING
+  REPLIED
+  CLOSED
+}
+
+model Quote {
+  id            String      @id @default(cuid())
+  contactName   String
+  contactRole   String?
+  clientEmail   String
+  clientPhone   String
+  buildingType  String?
+  propertyType  String?
+  siteAddress   String
+  addressDetail String?
+  serviceId     String
+  serviceLabel  String
+  floors        Int?
+  status        QuoteStatus @default(PENDING)
+  adminResponse String?
+  respondedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([clientEmail])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

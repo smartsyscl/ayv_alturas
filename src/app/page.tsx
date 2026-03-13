@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Building, Home as HomeIcon } from 'lucide-react';
 import Logo from '@/components/logo';
-import { Button } from '@/components/ui/button';
 
 const mainCategories = [
   {
@@ -26,11 +25,6 @@ const mainCategories = [
 export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
-       <header className="absolute top-4 right-4">
-        <Link href="/login" passHref>
-            <Button variant="outline">Admin</Button>
-        </Link>
-      </header>
       <main className="flex-1">
         <div className="container py-12 md:py-20">
           <div className="text-center mb-12">

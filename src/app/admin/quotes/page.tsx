@@ -1,23 +1,28 @@
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import AdminQuotesList from "@/components/admin-quotes-list";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminQuotesPage() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminQuotesPage() {
+  const quotesRaw = await prisma.quote.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  const quotes = quotesRaw.map((quote) => ({
+    ...quote,
+    createdAt: quote.createdAt.toISOString(),
+    respondedAt: quote.respondedAt?.toISOString() ?? null,
+  }));
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold font-headline">Historial de Cotizaciones</h1>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Cotizaciones Generadas</CardTitle>
-          <CardDescription>Un historial de todas las cotizaciones creadas.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-muted-foreground py-12">
-            <p>La lista de cotizaciones generadas aparecerá aquí.</p>
-          </div>
-        </CardContent>
-      </Card>
+      <AdminQuotesList quotes={quotes} />
     </div>
   );
 }

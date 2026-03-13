@@ -1,34 +1,46 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# IDX
-.idx/
-
-# Dependencies
+# dependencies
 /node_modules
 /.pnp
 .pnp.js
+.yarn/install-state.gz
 
-# Next.js
+# testing
+/coverage
+
+# next.js
 /.next/
 /out/
 
-# Production
+# production
 /build
 
-# Miscellaneous
+# misc
 .DS_Store
 *.pem
 
-# Logs
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Environment Variables
-.env
+# local env files
 .env*.local
+.env
 
-# Typescript
+# vercel
+.vercel
+
+# project-specific
+.idx/
+dev.db
+e2e.db
+prisma/dev.db
 *.tsbuildinfo
+src/generated/prisma
+.modified
+playwright-report/
+test-results/

@@ -51,6 +51,7 @@ type FormData = z.infer<typeof formSchema>;
 function QuoteGeneratorInternal() {
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get('service');
   const isHomeFlow = serviceParam === 'facade_painting';
@@ -98,14 +99,37 @@ function QuoteGeneratorInternal() {
     return "Pide tu cotización online";
   }
 
-  const onSubmit = (data: FormData) => {
-    console.log("Form Submitted:", data);
-    toast({
-        title: "Solicitud Enviada",
-        description: "Tu solicitud de cotización ha sido enviada con éxito.",
-    });
-    form.reset();
-    setCurrentStep(0);
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsSubmitting(true);
+
+      const response = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('No se pudo enviar la solicitud.');
+      }
+
+      toast({
+          title: "Solicitud Enviada",
+          description: "Tu solicitud de cotización ha sido enviada con éxito.",
+      });
+      form.reset();
+      setCurrentStep(0);
+    } catch {
+      toast({
+        variant: 'destructive',
+        title: 'Error al enviar',
+        description: 'No pudimos guardar tu cotización. Intenta nuevamente.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const nextStep = async () => {
@@ -341,9 +365,9 @@ function QuoteGeneratorInternal() {
                         <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                 ) : (
-                    <Button type="submit" size="sm" disabled={!isStepValid(currentStep)}>
+                    <Button type="submit" size="sm" disabled={!isStepValid(currentStep) || isSubmitting}>
                         <Send className="mr-2 h-4 w-4" />
-                        Enviar
+                      {isSubmitting ? 'Enviando...' : 'Enviar'}
                     </Button>
                 )}
             </CardFooter>

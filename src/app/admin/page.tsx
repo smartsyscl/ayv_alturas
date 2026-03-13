@@ -1,12 +1,37 @@
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Briefcase, FileText, Users, BarChart } from "lucide-react";
+import { prisma } from "@/lib/prisma";
 
-export default function AdminDashboard() {
+export const dynamic = "force-dynamic";
+
+export default async function AdminDashboard() {
+  const [totalQuotes, pendingQuotes, repliedQuotes, customers] = await Promise.all([
+    prisma.quote.count(),
+    prisma.quote.count({ where: { status: "PENDING" } }),
+    prisma.quote.count({ where: { status: "REPLIED" } }),
+    prisma.quote.groupBy({ by: ["clientEmail"] }),
+  ]);
+
   const stats = [
-    { title: "Cotizaciones Creadas", value: "152", icon: FileText, change: "+20.1% desde el mes pasado" },
-    { title: "Clientes Activos", value: "89", icon: Users, change: "+12.4% desde el mes pasado" },
-    { title: "Servicios Ofrecidos", value: "4", icon: Briefcase, change: "Estable" },
+    {
+      title: "Cotizaciones Creadas",
+      value: totalQuotes.toString(),
+      icon: FileText,
+      change: `${pendingQuotes} pendientes de respuesta`,
+    },
+    {
+      title: "Clientes Activos",
+      value: customers.length.toString(),
+      icon: Users,
+      change: "Clientes unicos por email",
+    },
+    {
+      title: "Cotizaciones Respondidas",
+      value: repliedQuotes.toString(),
+      icon: Briefcase,
+      change: "Listas para seguimiento comercial",
+    },
   ];
 
   return (

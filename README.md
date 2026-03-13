@@ -30,6 +30,88 @@
   - **React Hook Form & Zod:** Para la gestión eficiente y validación robusta de formularios.
 - **Hosting:** Diseñado para ser desplegado en **Vercel** o **Firebase App Hosting**.
 
+## Backend y Persistencia
+
+- **Base de datos:** PostgreSQL gestionado con Prisma ORM.
+- **Autenticación Admin:** sesión con cookie `httpOnly` firmada en servidor.
+- **Flujos activos:**
+  - Registro de cotizaciones desde `/cotizar`.
+  - Visualización de cotizaciones y clientes en `/admin`.
+  - Respuesta y cierre de cotizaciones desde el panel admin.
+
+### Variables de entorno requeridas
+
+Crear (o actualizar) el archivo `.env` con:
+
+```env
+DATABASE_URL="postgresql://usuario:password@host:5432/db?sslmode=require"
+AUTH_SECRET="cambia-esta-clave-secreta"
+ADMIN_USERNAME="demo"
+ADMIN_PASSWORD="demo"
+```
+
+### Comandos iniciales del backend
+
+```bash
+npm install
+npx prisma migrate deploy
+npm run dev
+```
+
+Prisma aplica las migraciones en `prisma/migrations` sobre la base PostgreSQL configurada en `DATABASE_URL`.
+
+### Despliegue en Vercel (con backend)
+
+Para Vercel **Production**, usa base de datos PostgreSQL gestionada.
+
+Variables obligatorias en Vercel:
+
+```env
+DATABASE_URL="postgresql://..."
+AUTH_SECRET="clave-larga-y-segura"
+ADMIN_USERNAME="admin"
+ADMIN_PASSWORD="clave-segura"
+```
+
+El proyecto incluye `vercel-build`, que valida entorno y ejecuta migraciones Prisma antes del build:
+
+```bash
+npm run vercel-build
+```
+
+Paso a paso sugerido:
+- Configura variables en Vercel (Preview y Production).
+- Haz push a la rama principal.
+- Verifica en logs que `npm run vercel-build` termine en verde.
+- Prueba en URL desplegada: `/cotizar`, `/login`, `/admin/quotes`, `/admin/customers`.
+
+### Pruebas y calidad (recomendado antes de cada release)
+
+```bash
+npm run typecheck
+npm run lint
+npm run build
+```
+
+### Prueba E2E del flujo critico (cotizar + admin)
+
+Primera vez en tu maquina:
+
+```bash
+npx playwright install chromium
+```
+
+Ejecucion:
+
+```bash
+npm run test:e2e
+```
+
+La suite E2E levanta la app en local, aplica migraciones Prisma y valida:
+- Envio de cotizacion desde `/cotizar`.
+- Inicio de sesion de administrador.
+- Visualizacion de la nueva cotizacion en `/admin/quotes`.
+
 ---
 
 Desarrollado por Jean Pérez - SMARTSYS

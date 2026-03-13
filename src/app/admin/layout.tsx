@@ -18,12 +18,12 @@ import {
   FileText, 
   Users, 
   Settings, 
-  LogOut,
   Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 import Logo from "@/components/logo";
+import AdminLogoutButton from "@/components/admin-logout-button";
 
 export default function AdminLayout({
   children,
@@ -91,12 +91,7 @@ export default function AdminLayout({
                     <SidebarTrigger />
                 </SidebarMenuItem>
                 <SidebarMenuItem>
-                    <Link href="/login" passHref>
-                        <SidebarMenuButton tooltip="Salir">
-                            <LogOut />
-                            <span>Salir</span>
-                        </SidebarMenuButton>
-                    </Link>
+                  <AdminLogoutButton />
                 </SidebarMenuItem>
             </SidebarMenu>
         </SidebarFooter>

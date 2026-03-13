@@ -285,7 +285,7 @@ const SidebarTrigger = React.forwardRef<
   if (asChild) {
     return (
       <Slot onClick={(e) => {
-        onClick?.(e);
+        onClick?.(e as React.MouseEvent<HTMLButtonElement>);
         toggleSidebar();
       }} {...props}>
         {children}

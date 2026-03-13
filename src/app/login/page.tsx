@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Logo from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,19 +21,39 @@ import { LogIn } from 'lucide-react';
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === 'demo' && password === 'demo') {
-      router.push('/admin');
-    } else {
+
+    try {
+      setIsSubmitting(true);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Credenciales inválidas.');
+      }
+
+      const redirectTo = searchParams.get('redirect') || '/admin';
+      router.push(redirectTo);
+      router.refresh();
+    } catch {
       toast({
         variant: 'destructive',
         title: 'Error de autenticación',
         description: 'Usuario o contraseña incorrectos.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -75,9 +95,9 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
               <LogIn className="mr-2 h-4 w-4" />
-              Ingresar
+              {isSubmitting ? 'Ingresando...' : 'Ingresar'}
             </Button>
           </CardFooter>
         </form>
