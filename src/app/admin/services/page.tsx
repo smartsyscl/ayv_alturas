@@ -1,29 +1,20 @@
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import AdminServicesList from "@/components/admin-services-list";
+import { SERVICES, VISIT_PRICE } from "@/lib/services";
 
 export default function AdminServicesPage() {
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-1 mb-6">
         <h1 className="text-3xl font-bold font-headline">Gestionar Servicios</h1>
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Añadir Servicio
-        </Button>
+        <p className="text-sm text-muted-foreground">
+          Catálogo actual de servicios y precios. Visita técnica:{" "}
+          <strong>
+            {VISIT_PRICE.toLocaleString("es-CL", { style: "currency", currency: "CLP", minimumFractionDigits: 0 })}
+          </strong>
+        </p>
       </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Lista de Servicios</CardTitle>
-          <CardDescription>Añadir, editar o eliminar los servicios ofrecidos.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center text-muted-foreground py-12">
-            <p>La tabla de gestión de servicios estará aquí.</p>
-          </div>
-        </CardContent>
-      </Card>
+      <AdminServicesList services={SERVICES} />
     </div>
   );
 }
