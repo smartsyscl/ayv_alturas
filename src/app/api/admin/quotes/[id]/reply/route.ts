@@ -1,25 +1,30 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/verify-admin";
 import { prisma } from "@/lib/prisma";
-import { quoteReplySchema } from "@/lib/quote-schemas";
+import { notifyClient, type NotifyChannel } from "@/lib/notifications";
+
+const replyWithNotifySchema = z.object({
+  adminResponse: z.string().min(10, "La respuesta debe tener al menos 10 caracteres.").max(2000),
+  status: z.enum(["REPLIED", "CLOSED"]).default("REPLIED"),
+  notifyChannel: z.enum(["email", "whatsapp", "both", "none"]).default("none"),
+});
 
 type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
 export async function PATCH(request: Request, context: RouteContext) {
-  const cookieStore = await cookies();
-  const session = verifySessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+  const admin = await verifyAdmin(request);
 
-  if (!session) {
+  if (!admin) {
     return NextResponse.json({ message: "No autorizado." }, { status: 401 });
   }
 
   const { id } = await context.params;
   const json = await request.json();
-  const parsed = quoteReplySchema.safeParse(json);
+  const parsed = replyWithNotifySchema.safeParse(json);
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -34,8 +39,30 @@ export async function PATCH(request: Request, context: RouteContext) {
       adminResponse: parsed.data.adminResponse,
       status: parsed.data.status,
       respondedAt: new Date(),
+      respondedBy: admin.email,
     },
   });
 
-  return NextResponse.json({ quote: updated, message: "Cotizacion actualizada." });
+  // Enviar notificación al cliente si se solicitó
+  let notifyResult = null;
+  if (parsed.data.notifyChannel !== "none") {
+    notifyResult = await notifyClient(
+      {
+        clientName: updated.contactName,
+        clientEmail: updated.clientEmail,
+        clientPhone: updated.clientPhone,
+        serviceLabel: updated.serviceLabel,
+        adminResponse: parsed.data.adminResponse,
+        calculatedPrice: updated.calculatedPrice,
+        quoteId: updated.id,
+      },
+      parsed.data.notifyChannel as NotifyChannel,
+    );
+  }
+
+  return NextResponse.json({
+    quote: updated,
+    message: "Cotizacion actualizada.",
+    notification: notifyResult,
+  });
 }

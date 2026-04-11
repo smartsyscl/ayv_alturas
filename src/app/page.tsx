@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building, Home as HomeIcon } from 'lucide-react';
+import { Building, Home as HomeIcon, Briefcase } from 'lucide-react';
 import Logo from '@/components/logo';
 
 const mainCategories = [
@@ -10,14 +10,21 @@ const mainCategories = [
     name: 'Remodelación Edificio Comunitario',
     icon: Building,
     description: 'Soluciones integrales para edificios y comunidades.',
-    href: '/cotizar', // Dirige a la página general para elegir servicios complejos
+    href: '/cotizar',
   },
   {
     id: 'pintura_hogar',
     name: 'Pintar mi Hogar',
     icon: HomeIcon,
     description: 'Renueva el interior o exterior de tu casa.',
-    href: '/cotizar?service=facade_painting', // Pre-selecciona el servicio de pintura
+    href: '/cotizar?service=facade_painting',
+  },
+  {
+    id: 'corredor_propiedades',
+    name: 'Pintura para Corredor de Propiedades',
+    icon: Briefcase,
+    description: 'Blanqueado pre entrega y pintura decorativa para inmobiliarias.',
+    href: '/cotizar?service=broker',
   },
 ];
 
@@ -39,7 +46,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {mainCategories.map((category) => (
               <Link href={category.href} key={category.id} passHref>
                 <Card className="h-full flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-transform duration-200 cursor-pointer group">

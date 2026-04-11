@@ -22,7 +22,19 @@ test("flujo principal: cotizar y visualizar en admin", async ({ page }) => {
 
   await page.getByText("Pintura Interior", { exact: true }).click();
   await page.getByLabel("Número de Pisos de la Casa").fill("2");
-  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Siguiente" }).click();
+
+  // Paso 4: Medidas y Cotización
+  // Marcar checkbox de visita técnica
+  const visitLabel = page.getByText("Solicitar visita técnica y toma de medidas");
+  await visitLabel.scrollIntoViewIfNeeded();
+  await visitLabel.click();
+
+  // Aceptar términos
+  const termsLabel = page.getByText("Acepto los términos y condiciones");
+  await termsLabel.scrollIntoViewIfNeeded();
+  await termsLabel.click();
+
   await page.getByRole("button", { name: "Enviar" }).click();
 
   await expect(page.getByText("Solicitud Enviada", { exact: true })).toBeVisible();
@@ -36,5 +48,8 @@ test("flujo principal: cotizar y visualizar en admin", async ({ page }) => {
   await page.goto("/admin/quotes");
 
   await expect(page.getByText(contactName)).toBeVisible();
+
+  // Expandir la tarjeta para ver el detalle
+  await page.getByText(contactName).click();
   await expect(page.getByText(clientEmail)).toBeVisible();
 });

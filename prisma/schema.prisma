@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  engineType = "binary"
 }
 
 datasource db {
@@ -11,6 +10,20 @@ enum QuoteStatus {
   PENDING
   REPLIED
   CLOSED
+}
+
+enum PaymentStatus {
+  NOT_APPLICABLE
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
+enum PaymentMethod {
+  TRANSFER
+  WEBPAY
+  OTHER
 }
 
 model Quote {
@@ -29,12 +42,31 @@ model Quote {
   status        QuoteStatus @default(PENDING)
   adminResponse String?
   respondedAt   DateTime?
+  respondedBy   String?     // Email o username del admin que respondió
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  // Campos de medidas y precio (v2)
+  measurements    Json?   // { "interiorM2": 50, "fachadaM2": 30, "puertasQty": 4 }
+  requestVisit    Boolean @default(false)
+  calculatedPrice Int?    // Precio total calculado en CLP (centavos no aplican en CLP)
+
+  // Campos de pago
+  paymentStatus  PaymentStatus @default(NOT_APPLICABLE)
+  paymentMethod  PaymentMethod?
+  paymentAmount  Int?          // Monto pagado en CLP
+  paymentDate    DateTime?     // Fecha del último pago
+  paymentDueDate DateTime?     // Fecha de vencimiento del pago
+  paymentNote    String?       // Nota interna sobre el pago
 
   @@index([clientEmail])
   @@index([status])
   @@index([createdAt])
+  @@index([customerId])
+  @@index([paymentStatus])
 }
 
 model Customer {
@@ -44,4 +76,6 @@ model Customer {
   phone     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  quotes Quote[]
 }
