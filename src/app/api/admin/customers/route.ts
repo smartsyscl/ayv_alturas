@@ -1,15 +1,13 @@
-import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/verify-admin";
 import { prisma } from "@/lib/prisma";
 import { customerCreateSchema } from "@/lib/quote-schemas";
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const session = verifySessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+  const admin = await verifyAdmin(request);
 
-  if (!session) {
+  if (!admin) {
     return NextResponse.json({ message: "No autorizado." }, { status: 401 });
   }
 

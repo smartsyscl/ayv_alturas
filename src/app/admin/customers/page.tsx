@@ -9,30 +9,24 @@ export default async function AdminCustomersPage() {
     orderBy: {
       updatedAt: "desc",
     },
+    include: {
+      _count: { select: { quotes: true } },
+      quotes: {
+        select: { createdAt: true },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+      },
+    },
   });
 
-  const quoteSummary = await prisma.quote.groupBy({
-    by: ["clientEmail"],
-    _count: { id: true },
-    _max: { createdAt: true },
-  });
-
-  const summaryByEmail = new Map(
-    quoteSummary.map((item) => [item.clientEmail.toLowerCase(), item])
-  );
-
-  const customersWithStats = customers.map((customer) => {
-    const summary = summaryByEmail.get(customer.email.toLowerCase());
-
-    return {
-      id: customer.id,
-      name: customer.name,
-      email: customer.email,
-      phone: customer.phone,
-      quoteCount: summary?._count.id ?? 0,
-      lastQuoteAt: summary?._max.createdAt?.toISOString() ?? null,
-    };
-  });
+  const customersWithStats = customers.map((customer) => ({
+    id: customer.id,
+    name: customer.name,
+    email: customer.email,
+    phone: customer.phone,
+    quoteCount: customer._count.quotes,
+    lastQuoteAt: customer.quotes[0]?.createdAt.toISOString() ?? null,
+  }));
 
   return (
     <div>
