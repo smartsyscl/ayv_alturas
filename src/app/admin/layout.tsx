@@ -27,17 +27,26 @@ import { Button } from "@/components/ui/button";
 import Logo from "@/components/logo";
 import AdminLogoutButton from "@/components/admin-logout-button";
 import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { auth } from "@/auth";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
-  const session = verifySessionToken(token);
+  // Verificar next-auth (Google / Credentials)
+  const session = await auth();
+  let isAuthenticated = !!session?.user;
 
-  if (!session) {
+  // Fallback: verificar sesión legacy (HMAC)
+  if (!isAuthenticated) {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
+    const legacySession = verifySessionToken(token);
+    isAuthenticated = !!legacySession;
+  }
+
+  if (!isAuthenticated) {
     redirect("/login?redirect=/admin");
   }
 
