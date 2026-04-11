@@ -7,7 +7,7 @@
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build": "node ./node_modules/next/dist/bin/next build",
-    "vercel-build": "npm run check:deploy-env && npx prisma generate && npx prisma migrate deploy && npm run build",
+    "vercel-build": "npm run check:deploy-env && npx prisma generate && node scripts/migrate-with-retry.mjs && npm run build",
     "start": "node ./node_modules/next/dist/bin/next start",
     "lint": "node ./node_modules/next/dist/bin/next lint",
     "check:deploy-env": "node scripts/check-deploy-env.mjs",
