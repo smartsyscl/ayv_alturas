@@ -15,6 +15,9 @@ export default async function AdminQuotesPage() {
     ...quote,
     createdAt: quote.createdAt.toISOString(),
     respondedAt: quote.respondedAt?.toISOString() ?? null,
+    measurements: (quote.measurements as Record<string, number> | null) ?? null,
+    paymentDate: quote.paymentDate?.toISOString() ?? null,
+    paymentDueDate: quote.paymentDueDate?.toISOString() ?? null,
   }));
 
   return (

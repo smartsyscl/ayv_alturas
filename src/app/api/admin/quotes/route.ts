@@ -1,20 +1,34 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-import { ADMIN_SESSION_COOKIE, verifySessionToken } from "@/lib/auth";
+import { verifyAdmin } from "@/lib/verify-admin";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
-  const cookieStore = await cookies();
-  const session = verifySessionToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
+const DEFAULT_PAGE_SIZE = 50;
+const MAX_PAGE_SIZE = 200;
 
-  if (!session) {
+export async function GET(request: NextRequest) {
+  const admin = await verifyAdmin();
+
+  if (!admin) {
     return NextResponse.json({ message: "No autorizado." }, { status: 401 });
   }
 
-  const quotes = await prisma.quote.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const { searchParams } = request.nextUrl;
+  const page = Math.max(1, Number(searchParams.get("page")) || 1);
+  const pageSize = Math.min(
+    MAX_PAGE_SIZE,
+    Math.max(1, Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE),
+  );
+  const skip = (page - 1) * pageSize;
 
-  return NextResponse.json({ quotes });
+  const [quotes, total] = await Promise.all([
+    prisma.quote.findMany({
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: pageSize,
+    }),
+    prisma.quote.count(),
+  ]);
+
+  return NextResponse.json({ quotes, total, page, pageSize });
 }
