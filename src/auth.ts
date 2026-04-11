@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
-import { isValidAdminCredentials } from "@/lib/auth";
+import { isValidAdminCredentials } from "@/lib/auth-edge";
 
 /**
  * Emails autorizados para acceder al panel de administración.

@@ -1,5 +1,8 @@
 import crypto from "node:crypto";
 
+// This module uses node:crypto – do NOT import from Edge middleware.
+// For edge-safe admin credential check, use src/lib/auth-edge.ts instead.
+
 export const ADMIN_SESSION_COOKIE = "admin_session";
 const SESSION_DURATION_SECONDS = 60 * 60 * 4; // 4 horas (antes era 8)
 
