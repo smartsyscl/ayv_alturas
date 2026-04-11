@@ -3,12 +3,22 @@
 import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
+function getDatasourceUrl(): string {
+  const raw = process.env["DATABASE_URL_APP"] ?? process.env["DATABASE_URL"] ?? "";
+  // Ensure Neon cold-start has enough time (30s connect timeout)
+  if (raw && !raw.includes("connect_timeout")) {
+    const sep = raw.includes("?") ? "&" : "?";
+    return `${raw}${sep}connect_timeout=30`;
+  }
+  return raw;
+}
+
 export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL_APP"] ?? process.env["DATABASE_URL"],
+    url: getDatasourceUrl(),
   },
 });
